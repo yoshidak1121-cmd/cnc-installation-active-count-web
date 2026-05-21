@@ -1,0 +1,73 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model InstallationBase {
+  base_id                  String   @id @default(cuid())
+  site_code                String
+  country                  String
+  install_year             Int
+  data_granularity         String
+  machine_builder          String?
+  nc_series                String?
+  area                     String?
+  installed_count          Int
+  installed_count_accuracy String
+  primary_flag             Boolean
+  source_file_name         String?
+  source_note              String?
+  note                     String?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+  active_maintenances      ActiveMaintenance[]
+}
+
+model ActiveMaintenance {
+  maintenance_id           String   @id @default(cuid())
+  base_id                  String
+  report_year              Int
+  previous_active_count    Int?
+  active_count             Int
+  inactive_count           Int
+  active_rate              Float
+  difference_from_previous Int?
+  difference_rate          Float?
+  active_count_method      String
+  active_count_accuracy    String
+  status_confirmed_date    String
+  confirmed_by             String?
+  change_reason            String?
+  status                   String   @default("Draft")
+  note                     String?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+  installation_base        InstallationBase @relation(fields: [base_id], references: [base_id])
+  issues                   IssueList[]
+}
+
+model IssueList {
+  issue_id           String   @id @default(cuid())
+  maintenance_id     String
+  issue_type         String
+  issue_detail       String
+  requested_by       String?
+  response           String?
+  status             String
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  active_maintenance ActiveMaintenance @relation(fields: [maintenance_id], references: [maintenance_id])
+}
+
+model User {
+  id         String   @id @default(cuid())
+  username   String   @unique
+  password   String
+  role       String
+  site_code  String?
+  created_at DateTime @default(now())
+}
