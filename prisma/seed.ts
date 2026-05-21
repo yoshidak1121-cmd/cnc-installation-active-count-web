@@ -98,30 +98,30 @@ async function main() {
   }
 
   // JP Total maintenance records
-  await createMaintenance(jp_total.base_id, 50, 2022, 38, null, 'Survey', 'confirmed', 'Approved', 'Tanaka')
-  await createMaintenance(jp_total.base_id, 50, 2023, 40, 38, 'Survey', 'confirmed', 'Approved', 'Tanaka')
-  const jpTotalDraftId = await createMaintenance(jp_total.base_id, 50, 2024, 42, 40, 'Survey', 'confirmed', 'Draft', 'Tanaka')
+  await createMaintenance(jp_total.base_id, 50, 2022, 38, null, 'confirmed_by_site', 'confirmed', 'Approved', 'Tanaka')
+  await createMaintenance(jp_total.base_id, 50, 2023, 40, 38, 'confirmed_by_site', 'confirmed', 'Approved', 'Tanaka')
+  await createMaintenance(jp_total.base_id, 50, 2024, 42, 40, 'confirmed_by_site', 'confirmed', 'Draft', 'Tanaka')
 
   // JP MTB maintenance records
-  await createMaintenance(jp_mtb.base_id, 30, 2022, 22, null, 'Survey', 'confirmed', 'Approved', 'Tanaka')
-  await createMaintenance(jp_mtb.base_id, 30, 2023, 24, 22, 'Survey', 'confirmed', 'Submitted', 'Tanaka')
+  await createMaintenance(jp_mtb.base_id, 30, 2022, 22, null, 'confirmed_by_site', 'confirmed', 'Approved', 'Tanaka')
+  await createMaintenance(jp_mtb.base_id, 30, 2023, 24, 22, 'confirmed_by_site', 'confirmed', 'Submitted', 'Tanaka')
 
   // US Total maintenance records
-  await createMaintenance(us_total.base_id, 40, 2022, 28, null, 'Estimation', 'estimated', 'Approved', 'Smith')
-  const usReturnedId = await createMaintenance(us_total.base_id, 40, 2023, 18, 28, 'Estimation', 'estimated', 'Returned', 'Smith')
-  await createMaintenance(us_total.base_id, 40, 2024, 30, 28, 'Estimation', 'estimated', 'Draft', 'Smith', 'New survey conducted')
+  await createMaintenance(us_total.base_id, 40, 2022, 28, null, 'estimated_by_active_rate', 'site_estimated', 'Approved', 'Smith')
+  const usReturnedId = await createMaintenance(us_total.base_id, 40, 2023, 18, 28, 'estimated_by_active_rate', 'site_estimated', 'Returned', 'Smith')
+  await createMaintenance(us_total.base_id, 40, 2024, 30, 28, 'estimated_by_active_rate', 'site_estimated', 'Draft', 'Smith', 'New survey conducted')
 
   // US NC maintenance
-  await createMaintenance(us_nc.base_id, 40, 2022, 28, null, 'Official Data', 'confirmed', 'Locked', 'Smith')
-  await createMaintenance(us_nc.base_id, 40, 2023, 30, 28, 'Official Data', 'confirmed', 'Approved', 'Smith')
+  await createMaintenance(us_nc.base_id, 40, 2022, 28, null, 'calculated_from_status', 'confirmed', 'Locked', 'Smith')
+  await createMaintenance(us_nc.base_id, 40, 2023, 30, 28, 'calculated_from_status', 'confirmed', 'Approved', 'Smith')
 
   // DE Total maintenance
-  await createMaintenance(de_total.base_id, 25, 2022, 18, null, 'Survey', 'confirmed', 'Locked', 'Mueller')
-  await createMaintenance(de_total.base_id, 25, 2023, 20, 18, 'Survey', 'confirmed', 'Approved', 'Mueller')
-  await createMaintenance(de_total.base_id, 25, 2024, 21, 20, 'Survey', 'estimated', 'Submitted', 'Mueller')
+  await createMaintenance(de_total.base_id, 25, 2022, 18, null, 'confirmed_by_site', 'confirmed', 'Locked', 'Mueller')
+  await createMaintenance(de_total.base_id, 25, 2023, 20, 18, 'confirmed_by_site', 'confirmed', 'Approved', 'Mueller')
+  await createMaintenance(de_total.base_id, 25, 2024, 21, 20, 'confirmed_by_site', 'hq_estimated', 'Submitted', 'Mueller')
 
   // DE Area maintenance
-  await createMaintenance(de_area.base_id, 25, 2023, 20, null, 'Estimation', 'estimated', 'Draft', 'Mueller')
+  await createMaintenance(de_area.base_id, 25, 2023, 20, null, 'estimated_by_active_rate', 'hq_estimated', 'Draft', 'Mueller')
 
   console.log('Created active maintenance records')
 

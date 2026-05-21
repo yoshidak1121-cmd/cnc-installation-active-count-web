@@ -44,8 +44,8 @@ const EMPTY: Omit<Installation, 'base_id'> = {
   installed_count_accuracy: 'confirmed', primary_flag: false, note: null,
 }
 
-const GRANULARITIES = ['Total', 'MTB', 'NCSeries', 'Area']
-const ACCURACIES = ['confirmed', 'estimated']
+const GRANULARITIES = ['Total', 'MTB', 'NCSeries', 'Area', 'Detail']
+const ACCURACIES = ['confirmed', 'estimated', 'unknown']
 
 export default function InstallationPage() {
   const [records, setRecords] = useState<Installation[]>([])

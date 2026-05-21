@@ -20,7 +20,13 @@ npm install
 
 ### 2. Configure environment
 
-The `.env` file already contains:
+Copy `.env.example` to `.env`:
+
+```bash
+cp .env.example .env
+```
+
+The default value uses a local SQLite file:
 
 ```env
 DATABASE_URL="file:./dev.db"

@@ -42,8 +42,8 @@ const STATUS_COLORS: Record<string, string> = {
   Locked: 'bg-purple-100 text-purple-700',
 }
 
-const METHODS = ['Survey', 'Estimation', 'Official Data', 'Other']
-const ACCURACIES = ['confirmed', 'estimated', 'approximate']
+const METHODS = ['confirmed_by_site', 'calculated_from_status', 'estimated_by_active_rate', 'estimated_by_age_rate', 'unknown']
+const ACCURACIES = ['confirmed', 'site_estimated', 'hq_estimated', 'unknown']
 
 function formatRate(rate: number | null | undefined): string {
   return rate != null ? `${(rate * 100).toFixed(1)}%` : '—'
