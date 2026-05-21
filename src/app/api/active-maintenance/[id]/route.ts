@@ -15,6 +15,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   })
   if (!record) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
+  if (user.role === 'site_staff' && user.site_code && record.installation_base.site_code !== user.site_code) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   const data = await req.json()
   const { errors } = validateActiveMaintenance({
     ...data,
@@ -52,8 +56,12 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const record = await prisma.activeMaintenance.findUnique({ where: { maintenance_id: id } })
+  const record = await prisma.activeMaintenance.findUnique({ where: { maintenance_id: id }, include: { installation_base: true } })
   if (!record) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  if (user.role === 'site_staff' && user.site_code && record.installation_base.site_code !== user.site_code) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   await prisma.activeMaintenance.delete({ where: { maintenance_id: id } })
   return NextResponse.json({ ok: true })
