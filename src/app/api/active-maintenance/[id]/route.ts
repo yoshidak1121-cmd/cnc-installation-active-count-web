@@ -15,10 +15,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   })
   if (!record) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  if (user.role === 'site_staff' && !['Draft', 'Returned'].includes(record.status)) {
-    return NextResponse.json({ error: 'Cannot edit record in current status' }, { status: 403 })
-  }
-
   const data = await req.json()
   const { errors } = validateActiveMaintenance({
     ...data,
@@ -44,9 +40,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       difference_rate: differenceRate,
       active_count_method: data.active_count_method,
       active_count_accuracy: data.active_count_accuracy,
-      status_confirmed_date: data.status_confirmed_date,
-      confirmed_by: data.confirmed_by ?? null,
-      change_reason: data.change_reason ?? null,
       note: data.note ?? null,
     },
     include: { installation_base: true },
@@ -61,9 +54,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   const { id } = await params
   const record = await prisma.activeMaintenance.findUnique({ where: { maintenance_id: id } })
   if (!record) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  if (record.status !== 'Draft') {
-    return NextResponse.json({ error: 'Only Draft records can be deleted' }, { status: 403 })
-  }
 
   await prisma.activeMaintenance.delete({ where: { maintenance_id: id } })
   return NextResponse.json({ ok: true })

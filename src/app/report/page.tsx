@@ -18,7 +18,6 @@ interface DetailRecord {
   active_count: number
   inactive_count: number
   active_rate: number
-  status: string
   installation_base: {
     site_code: string
     country: string
@@ -90,7 +89,7 @@ export default function ReportPage() {
         {!loading && aggregated.length > 0 && (
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-xl shadow p-4">
-              <p className="text-xs text-gray-500 mb-1">Total Installed (Primary)</p>
+              <p className="text-xs text-gray-500 mb-1">Total Installed</p>
               <p className="text-2xl font-bold text-gray-800">{totalInstalled.toLocaleString()}</p>
             </div>
             <div className="bg-white rounded-xl shadow p-4">
@@ -129,7 +128,7 @@ export default function ReportPage() {
               </thead>
               <tbody className="divide-y">
                 {aggregated.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-8 text-gray-400">No approved/locked data found</td></tr>
+                  <tr><td colSpan={6} className="text-center py-8 text-gray-400">No data found</td></tr>
                 ) : aggregated.sort((a, b) => b.year - a.year || a.country.localeCompare(b.country)).map((row, i) => (
                   <tr key={i} className="hover:bg-gray-50">
                     <td className="px-4 py-2 font-medium">{row.country}</td>
@@ -148,14 +147,14 @@ export default function ReportPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
                 <tr>
-                  {['Site','Country','Install Yr','Report Yr','Installed','Active','Inactive','Rate','Status'].map(h => (
+                  {['Site','Country','Install Yr','Report Yr','Installed','Active','Inactive','Rate'].map(h => (
                     <th key={h} className="px-3 py-2 text-left font-semibold">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {records.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-8 text-gray-400">No records found</td></tr>
+                  <tr><td colSpan={8} className="text-center py-8 text-gray-400">No records found</td></tr>
                 ) : records.map(r => (
                   <tr key={r.maintenance_id} className="hover:bg-gray-50">
                     <td className="px-3 py-1.5 font-medium">{r.installation_base.site_code}</td>
@@ -166,11 +165,6 @@ export default function ReportPage() {
                     <td className="px-3 py-1.5 text-right">{r.active_count.toLocaleString()}</td>
                     <td className="px-3 py-1.5 text-right">{r.inactive_count.toLocaleString()}</td>
                     <td className="px-3 py-1.5 text-right">{(r.active_rate * 100).toFixed(1)}%</td>
-                    <td className="px-3 py-1.5">
-                      <span className={`px-2 py-0.5 rounded-full text-xs ${r.status === 'Locked' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'}`}>
-                        {r.status}
-                      </span>
-                    </td>
                   </tr>
                 ))}
               </tbody>

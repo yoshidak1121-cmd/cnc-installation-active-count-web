@@ -14,11 +14,7 @@ export async function GET(req: NextRequest) {
   const country = searchParams.get('country')
 
   const where: Record<string, unknown> = {
-    status: { in: ['Approved', 'Locked'] },
-    installation_base: {
-      primary_flag: true,
-      ...(country ? { country } : {}),
-    },
+    ...(country ? { installation_base: { country } } : {}),
   }
   if (yearParam) where.report_year = Number(yearParam)
 

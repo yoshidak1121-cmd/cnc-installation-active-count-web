@@ -5,7 +5,6 @@ export function validateInstallationBase(data: {
   data_granularity?: string
   installed_count?: number
   installed_count_accuracy?: string
-  primary_flag?: boolean
   machine_builder?: string
   nc_series?: string
   area?: string
@@ -24,7 +23,6 @@ export function validateInstallationBase(data: {
   if (!data.installed_count_accuracy || data.installed_count_accuracy.trim() === '') {
     errors.push('Installed count accuracy is required')
   }
-  if (data.primary_flag == null) errors.push('Primary flag is required')
 
   if (data.data_granularity === 'MTB' && (!data.machine_builder || data.machine_builder.trim() === '')) {
     errors.push('Machine builder is required for MTB granularity')
@@ -44,11 +42,9 @@ export function validateActiveMaintenance(data: {
   active_count?: number
   active_count_method?: string
   active_count_accuracy?: string
-  status_confirmed_date?: string
   installed_count?: number
   install_year?: number
   previous_active_count?: number | null
-  change_reason?: string
 }): { errors: string[]; warnings: string[] } {
   const errors: string[] = []
   const warnings: string[] = []
@@ -65,9 +61,6 @@ export function validateActiveMaintenance(data: {
   if (!data.active_count_accuracy || data.active_count_accuracy.trim() === '') {
     errors.push('Active count accuracy is required')
   }
-  if (!data.status_confirmed_date || data.status_confirmed_date.trim() === '') {
-    errors.push('Status confirmed date is required')
-  }
 
   if (data.active_count != null && data.installed_count != null) {
     if (data.active_count > data.installed_count) {
@@ -77,13 +70,6 @@ export function validateActiveMaintenance(data: {
     const activeRate = data.installed_count > 0 ? data.active_count / data.installed_count : 0
     if (activeRate < 0.05 && data.installed_count > 0) {
       warnings.push('Active rate is below 5% — please verify the data')
-    }
-  }
-
-  if (data.previous_active_count != null && data.active_count != null && data.previous_active_count > 0) {
-    const changeRate = Math.abs(data.active_count - data.previous_active_count) / data.previous_active_count
-    if (changeRate >= 0.2 && (!data.change_reason || data.change_reason.trim() === '')) {
-      errors.push('Change reason is required when year-over-year change is 20% or more')
     }
   }
 

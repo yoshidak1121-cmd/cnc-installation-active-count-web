@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 
   const records = await prisma.activeMaintenance.findMany({
     where,
-    include: { installation_base: true, issues: true },
+    include: { installation_base: true },
     orderBy: [{ report_year: 'desc' }, { base_id: 'asc' }],
   })
   return NextResponse.json(records)
@@ -69,10 +69,6 @@ export async function POST(req: NextRequest) {
       difference_rate: differenceRate,
       active_count_method: data.active_count_method,
       active_count_accuracy: data.active_count_accuracy,
-      status_confirmed_date: data.status_confirmed_date,
-      confirmed_by: data.confirmed_by ?? null,
-      change_reason: data.change_reason ?? null,
-      status: 'Draft',
       note: data.note ?? null,
     },
     include: { installation_base: true },

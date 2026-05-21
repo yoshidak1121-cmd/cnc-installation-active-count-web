@@ -11,7 +11,6 @@ interface Installation {
   install_year: number
   data_granularity: string
   installed_count: number
-  primary_flag: boolean
 }
 
 interface MaintenanceRecord {
@@ -26,20 +25,8 @@ interface MaintenanceRecord {
   difference_rate: number | null
   active_count_method: string
   active_count_accuracy: string
-  status_confirmed_date: string
-  confirmed_by: string | null
-  change_reason: string | null
-  status: string
   note: string | null
   installation_base: Installation
-}
-
-const STATUS_COLORS: Record<string, string> = {
-  Draft: 'bg-gray-100 text-gray-700',
-  Submitted: 'bg-blue-100 text-blue-700',
-  Approved: 'bg-green-100 text-green-700',
-  Returned: 'bg-red-100 text-red-700',
-  Locked: 'bg-purple-100 text-purple-700',
 }
 
 const METHODS = ['confirmed_by_site', 'calculated_from_status', 'estimated_by_active_rate', 'estimated_by_age_rate', 'unknown']
@@ -59,11 +46,9 @@ export default function ActiveMaintenancePage() {
   const [editId, setEditId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Partial<MaintenanceRecord>>({})
   const [showNewModal, setShowNewModal] = useState(false)
-  const [newForm, setNewForm] = useState({ base_id: '', active_count: 0, previous_active_count: '', active_count_method: 'Survey', active_count_accuracy: 'confirmed', status_confirmed_date: '', confirmed_by: '', change_reason: '', note: '' })
+  const [newForm, setNewForm] = useState({ base_id: '', active_count: 0, previous_active_count: '', active_count_method: 'confirmed_by_site', active_count_accuracy: 'confirmed', note: '' })
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
-  const [returnModal, setReturnModal] = useState<{ id: string } | null>(null)
-  const [returnForm, setReturnForm] = useState({ issue_type: '', issue_detail: '' })
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(d => setUserRole(d?.user?.role ?? ''))
@@ -84,7 +69,6 @@ export default function ActiveMaintenancePage() {
   }, [])
 
   const isHqOrAdmin = userRole === 'hq_staff' || userRole === 'admin'
-  const isSiteStaff = userRole === 'site_staff'
 
   function startEdit(r: MaintenanceRecord) {
     setEditId(r.maintenance_id)
@@ -120,49 +104,8 @@ export default function ActiveMaintenancePage() {
     else { const d = await res.json(); alert((d.errors ?? [d.error]).join('\n')) }
   }
 
-  async function handleSubmit(id: string) {
-    const res = await fetch(`/api/active-maintenance/${id}/submit`, { method: 'POST' })
-    if (res.ok) { fetchRecords(); setMessage('Submitted'); setTimeout(() => setMessage(''), 2000) }
-    else { const d = await res.json(); alert(d.error) }
-  }
-
-  async function handleApprove(id: string) {
-    const res = await fetch(`/api/active-maintenance/${id}/approve`, { method: 'POST' })
-    if (res.ok) { fetchRecords(); setMessage('Approved'); setTimeout(() => setMessage(''), 2000) }
-    else { const d = await res.json(); alert(d.error) }
-  }
-
-  async function handleReturn(id: string) {
-    setReturnModal({ id })
-    setReturnForm({ issue_type: '', issue_detail: '' })
-  }
-
-  async function submitReturn() {
-    if (!returnModal) return
-    if (!returnForm.issue_type || !returnForm.issue_detail) { alert('Both fields required'); return }
-    const res = await fetch(`/api/active-maintenance/${returnModal.id}/return`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(returnForm),
-    })
-    if (res.ok) {
-      setReturnModal(null)
-      fetchRecords()
-      setMessage('Returned')
-      setTimeout(() => setMessage(''), 2000)
-    } else {
-      const d = await res.json(); alert(d.error)
-    }
-  }
-
-  async function handleLock(id: string) {
-    const res = await fetch(`/api/active-maintenance/${id}/lock`, { method: 'POST' })
-    if (res.ok) { fetchRecords(); setMessage('Locked'); setTimeout(() => setMessage(''), 2000) }
-    else { const d = await res.json(); alert(d.error) }
-  }
-
   async function handleDelete(id: string) {
-    if (!confirm('Delete this draft?')) return
+    if (!confirm('Delete this record?')) return
     const res = await fetch(`/api/active-maintenance/${id}`, { method: 'DELETE' })
     if (res.ok) { fetchRecords(); setMessage('Deleted'); setTimeout(() => setMessage(''), 2000) }
     else { const d = await res.json(); alert(d.error) }
@@ -191,9 +134,6 @@ export default function ActiveMaintenancePage() {
           active_count: pr.active_count,
           active_count_method: pr.active_count_method,
           active_count_accuracy: pr.active_count_accuracy,
-          status_confirmed_date: new Date().toISOString().slice(0, 10),
-          confirmed_by: pr.confirmed_by ?? '',
-          change_reason: '',
           note: `Copied from ${prevYear}`,
         }),
       })
@@ -252,24 +192,18 @@ export default function ActiveMaintenancePage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
               <tr>
-                {['Site','Country','Year','Granularity','Active','Inactive','Rate','Prev','Diff','Method','Accuracy','Date','Status','Actions'].map(h => (
+                {['Site','Country','Year','Granularity','Active','Inactive','Rate','Prev','Diff','Method','Accuracy','Actions'].map(h => (
                   <th key={h} className="px-2 py-2 text-left font-semibold">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y">
               {loading ? (
-                <tr><td colSpan={14} className="text-center py-8 text-gray-400">Loading…</td></tr>
+                <tr><td colSpan={12} className="text-center py-8 text-gray-400">Loading…</td></tr>
               ) : records.length === 0 ? (
-                <tr><td colSpan={14} className="text-center py-8 text-gray-400">No records found</td></tr>
+                <tr><td colSpan={12} className="text-center py-8 text-gray-400">No records found</td></tr>
               ) : records.map((r) => {
                 const isEditing = editId === r.maintenance_id
-                const canEdit = isSiteStaff && ['Draft', 'Returned'].includes(r.status)
-                const canSubmit = isSiteStaff && ['Draft', 'Returned'].includes(r.status)
-                const canApproveReturn = isHqOrAdmin && ['Submitted', 'Under Review'].includes(r.status)
-                const canLock = userRole === 'admin' && r.status === 'Approved'
-                const canDelete = r.status === 'Draft'
-
                 return (
                   <tr key={r.maintenance_id} className="hover:bg-gray-50">
                     <td className="px-2 py-1.5 font-medium">{r.installation_base.site_code}</td>
@@ -303,17 +237,6 @@ export default function ActiveMaintenancePage() {
                       ) : r.active_count_accuracy}
                     </td>
                     <td className="px-2 py-1.5">
-                      {isEditing ? (
-                        <input type="date" value={editForm.status_confirmed_date ?? ''} onChange={e => handleEditChange('status_confirmed_date', e.target.value)}
-                          className="border rounded px-1 py-0.5 text-xs" />
-                      ) : r.status_confirmed_date}
-                    </td>
-                    <td className="px-2 py-1.5">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[r.status] ?? 'bg-gray-100 text-gray-600'}`}>
-                        {r.status}
-                      </span>
-                    </td>
-                    <td className="px-2 py-1.5">
                       <div className="flex gap-1 flex-wrap">
                         {isEditing ? (
                           <>
@@ -322,16 +245,8 @@ export default function ActiveMaintenancePage() {
                           </>
                         ) : (
                           <>
-                            {canEdit && <button onClick={() => startEdit(r)} className="text-xs text-blue-600 hover:underline">Edit</button>}
-                            {canSubmit && <button onClick={() => handleSubmit(r.maintenance_id)} className="text-xs text-green-600 hover:underline">Submit</button>}
-                            {canApproveReturn && (
-                              <>
-                                <button onClick={() => handleApprove(r.maintenance_id)} className="text-xs text-green-600 hover:underline">Approve</button>
-                                <button onClick={() => handleReturn(r.maintenance_id)} className="text-xs text-red-500 hover:underline">Return</button>
-                              </>
-                            )}
-                            {canLock && <button onClick={() => handleLock(r.maintenance_id)} className="text-xs text-purple-600 hover:underline">Lock</button>}
-                            {canDelete && <button onClick={() => handleDelete(r.maintenance_id)} className="text-xs text-red-400 hover:underline">Delete</button>}
+                            <button onClick={() => startEdit(r)} className="text-xs text-blue-600 hover:underline">Edit</button>
+                            <button onClick={() => handleDelete(r.maintenance_id)} className="text-xs text-red-400 hover:underline">Delete</button>
                           </>
                         )}
                       </div>
@@ -385,21 +300,6 @@ export default function ActiveMaintenancePage() {
                   {ACCURACIES.map(a => <option key={a}>{a}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="block text-xs font-medium mb-1">Confirmed Date *</label>
-                <input type="date" value={newForm.status_confirmed_date} onChange={e => setNewForm({ ...newForm, status_confirmed_date: e.target.value })}
-                  className="w-full border rounded px-2 py-1.5 text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1">Confirmed By</label>
-                <input value={newForm.confirmed_by} onChange={e => setNewForm({ ...newForm, confirmed_by: e.target.value })}
-                  className="w-full border rounded px-2 py-1.5 text-sm" />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-xs font-medium mb-1">Change Reason</label>
-                <input value={newForm.change_reason} onChange={e => setNewForm({ ...newForm, change_reason: e.target.value })}
-                  className="w-full border rounded px-2 py-1.5 text-sm" />
-              </div>
               <div className="col-span-2">
                 <label className="block text-xs font-medium mb-1">Note</label>
                 <textarea value={newForm.note} onChange={e => setNewForm({ ...newForm, note: e.target.value })}
@@ -411,32 +311,6 @@ export default function ActiveMaintenancePage() {
               <button onClick={handleCreate} disabled={saving} className="px-4 py-2 rounded bg-blue-700 text-white text-sm hover:bg-blue-600 disabled:opacity-60">
                 {saving ? 'Saving…' : 'Create'}
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {returnModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-bold mb-4">Return Record</h2>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium mb-1">Issue Type *</label>
-                <input value={returnForm.issue_type} onChange={e => setReturnForm({ ...returnForm, issue_type: e.target.value })}
-                  placeholder="e.g. DataError, MissingInfo"
-                  className="w-full border rounded px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Issue Detail *</label>
-                <textarea value={returnForm.issue_detail} onChange={e => setReturnForm({ ...returnForm, issue_detail: e.target.value })}
-                  placeholder="Describe the issue…"
-                  className="w-full border rounded px-3 py-2 text-sm" rows={4} />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button onClick={() => setReturnModal(null)} className="px-4 py-2 rounded border text-sm">Cancel</button>
-              <button onClick={submitReturn} className="px-4 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-500">Return</button>
             </div>
           </div>
         </div>

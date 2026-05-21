@@ -18,9 +18,6 @@ model InstallationBase {
   area                     String?
   installed_count          Int
   installed_count_accuracy String
-  primary_flag             Boolean
-  source_file_name         String?
-  source_note              String?
   note                     String?
   created_at               DateTime @default(now())
   updated_at               DateTime @updatedAt
@@ -39,28 +36,10 @@ model ActiveMaintenance {
   difference_rate          Float?
   active_count_method      String
   active_count_accuracy    String
-  status_confirmed_date    String
-  confirmed_by             String?
-  change_reason            String?
-  status                   String   @default("Draft")
   note                     String?
   created_at               DateTime @default(now())
   updated_at               DateTime @updatedAt
   installation_base        InstallationBase @relation(fields: [base_id], references: [base_id])
-  issues                   IssueList[]
-}
-
-model IssueList {
-  issue_id           String   @id @default(cuid())
-  maintenance_id     String
-  issue_type         String
-  issue_detail       String
-  requested_by       String?
-  response           String?
-  status             String
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
-  active_maintenance ActiveMaintenance @relation(fields: [maintenance_id], references: [maintenance_id])
 }
 
 model User {

@@ -47,9 +47,6 @@ export default function Navigation() {
           </Link>
           {isHqOrAdmin && (
             <>
-              <Link href="/hq-review" className="text-sm hover:text-blue-200">
-                HQ Review
-              </Link>
               <Link href="/report" className="text-sm hover:text-blue-200">
                 Report
               </Link>

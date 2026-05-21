@@ -34,14 +34,13 @@ interface Installation {
   area: string | null
   installed_count: number
   installed_count_accuracy: string
-  primary_flag: boolean
   note: string | null
 }
 
 const EMPTY: Omit<Installation, 'base_id'> = {
   site_code: '', country: '', install_year: new Date().getFullYear(), data_granularity: 'Total',
   machine_builder: null, nc_series: null, area: null, installed_count: 0,
-  installed_count_accuracy: 'confirmed', primary_flag: false, note: null,
+  installed_count_accuracy: 'confirmed', note: null,
 }
 
 const GRANULARITIES = ['Total', 'MTB', 'NCSeries', 'Area', 'Detail']
@@ -139,7 +138,7 @@ export default function InstallationPage() {
           data_granularity: row.data_granularity, machine_builder: row.machine_builder || null,
           nc_series: row.nc_series || null, area: row.area || null,
           installed_count: Number(row.installed_count), installed_count_accuracy: row.installed_count_accuracy,
-          primary_flag: row.primary_flag === 'true', note: row.note || null,
+          note: row.note || null,
         }),
       })
       if (res.ok) imported++
@@ -182,16 +181,16 @@ export default function InstallationPage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
               <tr>
-                {['Site Code','Country','Year','Granularity','Builder','NC Series','Area','Installed','Accuracy','Primary','Note','Actions'].map((h) => (
+                {['Site Code','Country','Year','Granularity','Builder','NC Series','Area','Installed','Accuracy','Note','Actions'].map((h) => (
                   <th key={h} className="px-3 py-2 text-left font-semibold">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y">
               {loading ? (
-                <tr><td colSpan={12} className="text-center py-8 text-gray-400">Loading…</td></tr>
+                <tr><td colSpan={11} className="text-center py-8 text-gray-400">Loading…</td></tr>
               ) : records.length === 0 ? (
-                <tr><td colSpan={12} className="text-center py-8 text-gray-400">No records found</td></tr>
+                <tr><td colSpan={11} className="text-center py-8 text-gray-400">No records found</td></tr>
               ) : records.map((r) => (
                 <tr key={r.base_id} className="hover:bg-gray-50">
                   <td className="px-3 py-2 font-medium">{r.site_code}</td>
@@ -203,7 +202,6 @@ export default function InstallationPage() {
                   <td className="px-3 py-2">{r.area ?? '—'}</td>
                   <td className="px-3 py-2 text-right">{r.installed_count.toLocaleString()}</td>
                   <td className="px-3 py-2">{r.installed_count_accuracy}</td>
-                  <td className="px-3 py-2 text-center">{r.primary_flag ? '✓' : ''}</td>
                   <td className="px-3 py-2 text-gray-400">{r.note ?? ''}</td>
                   <td className="px-3 py-2 flex gap-1">
                     <button onClick={() => openEdit(r)} className="text-blue-600 hover:underline text-xs">Edit</button>
@@ -280,10 +278,6 @@ export default function InstallationPage() {
                   className="w-full border rounded px-2 py-1.5 text-sm">
                   {ACCURACIES.map((a) => <option key={a}>{a}</option>)}
                 </select>
-              </div>
-              <div className="col-span-2 flex items-center gap-2">
-                <input type="checkbox" checked={form.primary_flag} onChange={(e) => setForm({ ...form, primary_flag: e.target.checked })} id="primary_flag" />
-                <label htmlFor="primary_flag" className="text-sm">Primary Flag</label>
               </div>
               <div className="col-span-2">
                 <label className="block text-xs font-medium mb-1">Note</label>

@@ -35,9 +35,7 @@ export async function GET() {
   }
 
   // Check ActiveMaintenance records
-  const maintenanceWhere: Record<string, unknown> = {
-    status: { in: ['Draft', 'Returned'] },
-  }
+  const maintenanceWhere: Record<string, unknown> = {}
   if (user.role === 'site_staff' && user.site_code) {
     maintenanceWhere.installation_base = { site_code: user.site_code }
   }
@@ -49,7 +47,7 @@ export async function GET() {
 
   for (const m of maintenances) {
     const site = m.installation_base.site_code
-    if (!m.active_count_method || !m.active_count_accuracy || !m.status_confirmed_date) {
+    if (!m.active_count_method || !m.active_count_accuracy) {
       items.push({ type: 'error', message: 'Missing required fields in active maintenance', site_code: site, base_id: m.base_id, maintenance_id: m.maintenance_id, report_year: m.report_year })
     }
 
@@ -59,13 +57,6 @@ export async function GET() {
 
     if (m.installation_base.installed_count > 0 && m.active_rate < 0.05) {
       items.push({ type: 'warning', message: `Active rate is very low (${(m.active_rate * 100).toFixed(1)}%) — please verify`, site_code: site, base_id: m.base_id, maintenance_id: m.maintenance_id, report_year: m.report_year })
-    }
-
-    if (m.previous_active_count != null && m.previous_active_count > 0) {
-      const changeRate = Math.abs(m.active_count - m.previous_active_count) / m.previous_active_count
-      if (changeRate >= 0.2 && (!m.change_reason || m.change_reason.trim() === '')) {
-        items.push({ type: 'error', message: `Year-over-year change is ${(changeRate * 100).toFixed(0)}% but no change reason provided`, site_code: site, base_id: m.base_id, maintenance_id: m.maintenance_id, report_year: m.report_year })
-      }
     }
 
     if (m.previous_active_count != null && m.active_count === m.previous_active_count) {
