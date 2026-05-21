@@ -24,7 +24,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       area: data.area ?? null,
       installed_count: Number(data.installed_count),
       installed_count_accuracy: data.installed_count_accuracy,
-      primary_flag: Boolean(data.primary_flag),
       source_file_name: data.source_file_name ?? null,
       source_note: data.source_note ?? null,
       note: data.note ?? null,

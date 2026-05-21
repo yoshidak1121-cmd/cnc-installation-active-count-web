@@ -5,7 +5,6 @@ export function validateInstallationBase(data: {
   data_granularity?: string
   installed_count?: number
   installed_count_accuracy?: string
-  primary_flag?: boolean
   machine_builder?: string
   nc_series?: string
   area?: string
@@ -24,8 +23,6 @@ export function validateInstallationBase(data: {
   if (!data.installed_count_accuracy || data.installed_count_accuracy.trim() === '') {
     errors.push('Installed count accuracy is required')
   }
-  if (data.primary_flag == null) errors.push('Primary flag is required')
-
   if (data.data_granularity === 'MTB' && (!data.machine_builder || data.machine_builder.trim() === '')) {
     errors.push('Machine builder is required for MTB granularity')
   }

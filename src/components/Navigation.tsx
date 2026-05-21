@@ -46,14 +46,9 @@ export default function Navigation() {
             Input Check
           </Link>
           {isHqOrAdmin && (
-            <>
-              <Link href="/hq-review" className="text-sm hover:text-blue-200">
-                HQ Review
-              </Link>
-              <Link href="/report" className="text-sm hover:text-blue-200">
-                Report
-              </Link>
-            </>
+            <Link href="/report" className="text-sm hover:text-blue-200">
+              Report
+            </Link>
           )}
         </div>
         <div className="flex items-center gap-4">

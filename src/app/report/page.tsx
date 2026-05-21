@@ -90,7 +90,7 @@ export default function ReportPage() {
         {!loading && aggregated.length > 0 && (
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-xl shadow p-4">
-              <p className="text-xs text-gray-500 mb-1">Total Installed (Primary)</p>
+              <p className="text-xs text-gray-500 mb-1">Total Installed</p>
               <p className="text-2xl font-bold text-gray-800">{totalInstalled.toLocaleString()}</p>
             </div>
             <div className="bg-white rounded-xl shadow p-4">
@@ -129,7 +129,7 @@ export default function ReportPage() {
               </thead>
               <tbody className="divide-y">
                 {aggregated.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-8 text-gray-400">No approved/locked data found</td></tr>
+                  <tr><td colSpan={6} className="text-center py-8 text-gray-400">No submitted/locked data found</td></tr>
                 ) : aggregated.sort((a, b) => b.year - a.year || a.country.localeCompare(b.country)).map((row, i) => (
                   <tr key={i} className="hover:bg-gray-50">
                     <td className="px-4 py-2 font-medium">{row.country}</td>

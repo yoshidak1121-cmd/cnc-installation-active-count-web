@@ -24,32 +24,32 @@ async function main() {
   const jp_total = await prisma.installationBase.upsert({
     where: { base_id: 'seed-jp-total' },
     update: {},
-    create: { base_id: 'seed-jp-total', site_code: 'JP001', country: 'Japan', install_year: 2020, data_granularity: 'Total', installed_count: 50, primary_flag: true, installed_count_accuracy: 'confirmed' },
+    create: { base_id: 'seed-jp-total', site_code: 'JP001', country: 'Japan', install_year: 2020, data_granularity: 'Total', installed_count: 50, installed_count_accuracy: 'confirmed' },
   })
   const jp_mtb = await prisma.installationBase.upsert({
     where: { base_id: 'seed-jp-mtb' },
     update: {},
-    create: { base_id: 'seed-jp-mtb', site_code: 'JP001', country: 'Japan', install_year: 2020, data_granularity: 'MTB', machine_builder: 'FANUC', installed_count: 30, primary_flag: false, installed_count_accuracy: 'confirmed' },
+    create: { base_id: 'seed-jp-mtb', site_code: 'JP001', country: 'Japan', install_year: 2020, data_granularity: 'MTB', machine_builder: 'FANUC', installed_count: 30, installed_count_accuracy: 'confirmed' },
   })
   const us_total = await prisma.installationBase.upsert({
     where: { base_id: 'seed-us-total' },
     update: {},
-    create: { base_id: 'seed-us-total', site_code: 'US001', country: 'USA', install_year: 2019, data_granularity: 'Total', installed_count: 40, primary_flag: true, installed_count_accuracy: 'estimated' },
+    create: { base_id: 'seed-us-total', site_code: 'US001', country: 'USA', install_year: 2019, data_granularity: 'Total', installed_count: 40, installed_count_accuracy: 'estimated' },
   })
   const us_nc = await prisma.installationBase.upsert({
     where: { base_id: 'seed-us-nc' },
     update: {},
-    create: { base_id: 'seed-us-nc', site_code: 'US001', country: 'USA', install_year: 2019, data_granularity: 'NCSeries', nc_series: '30i', installed_count: 40, primary_flag: false, installed_count_accuracy: 'estimated' },
+    create: { base_id: 'seed-us-nc', site_code: 'US001', country: 'USA', install_year: 2019, data_granularity: 'NCSeries', nc_series: '30i', installed_count: 40, installed_count_accuracy: 'estimated' },
   })
   const de_total = await prisma.installationBase.upsert({
     where: { base_id: 'seed-de-total' },
     update: {},
-    create: { base_id: 'seed-de-total', site_code: 'DE001', country: 'Germany', install_year: 2021, data_granularity: 'Total', installed_count: 25, primary_flag: true, installed_count_accuracy: 'confirmed' },
+    create: { base_id: 'seed-de-total', site_code: 'DE001', country: 'Germany', install_year: 2021, data_granularity: 'Total', installed_count: 25, installed_count_accuracy: 'confirmed' },
   })
   const de_area = await prisma.installationBase.upsert({
     where: { base_id: 'seed-de-area' },
     update: {},
-    create: { base_id: 'seed-de-area', site_code: 'DE001', country: 'Germany', install_year: 2021, data_granularity: 'Area', area: 'Europe', installed_count: 25, primary_flag: false, installed_count_accuracy: 'estimated' },
+    create: { base_id: 'seed-de-area', site_code: 'DE001', country: 'Germany', install_year: 2021, data_granularity: 'Area', area: 'Europe', installed_count: 25, installed_count_accuracy: 'estimated' },
   })
 
   console.log('Created 3 users and 6 installation bases')
@@ -98,48 +98,32 @@ async function main() {
   }
 
   // JP Total maintenance records
-  await createMaintenance(jp_total.base_id, 50, 2022, 38, null, 'confirmed_by_site', 'confirmed', 'Approved', 'Tanaka')
-  await createMaintenance(jp_total.base_id, 50, 2023, 40, 38, 'confirmed_by_site', 'confirmed', 'Approved', 'Tanaka')
+  await createMaintenance(jp_total.base_id, 50, 2022, 38, null, 'confirmed_by_site', 'confirmed', 'Locked', 'Tanaka')
+  await createMaintenance(jp_total.base_id, 50, 2023, 40, 38, 'confirmed_by_site', 'confirmed', 'Locked', 'Tanaka')
   await createMaintenance(jp_total.base_id, 50, 2024, 42, 40, 'confirmed_by_site', 'confirmed', 'Draft', 'Tanaka')
 
   // JP MTB maintenance records
-  await createMaintenance(jp_mtb.base_id, 30, 2022, 22, null, 'confirmed_by_site', 'confirmed', 'Approved', 'Tanaka')
+  await createMaintenance(jp_mtb.base_id, 30, 2022, 22, null, 'confirmed_by_site', 'confirmed', 'Locked', 'Tanaka')
   await createMaintenance(jp_mtb.base_id, 30, 2023, 24, 22, 'confirmed_by_site', 'confirmed', 'Submitted', 'Tanaka')
 
   // US Total maintenance records
-  await createMaintenance(us_total.base_id, 40, 2022, 28, null, 'estimated_by_active_rate', 'site_estimated', 'Approved', 'Smith')
-  const usReturnedId = await createMaintenance(us_total.base_id, 40, 2023, 18, 28, 'estimated_by_active_rate', 'site_estimated', 'Returned', 'Smith')
+  await createMaintenance(us_total.base_id, 40, 2022, 28, null, 'estimated_by_active_rate', 'site_estimated', 'Locked', 'Smith')
+  await createMaintenance(us_total.base_id, 40, 2023, 18, 28, 'estimated_by_active_rate', 'site_estimated', 'Submitted', 'Smith')
   await createMaintenance(us_total.base_id, 40, 2024, 30, 28, 'estimated_by_active_rate', 'site_estimated', 'Draft', 'Smith', 'New survey conducted')
 
   // US NC maintenance
   await createMaintenance(us_nc.base_id, 40, 2022, 28, null, 'calculated_from_status', 'confirmed', 'Locked', 'Smith')
-  await createMaintenance(us_nc.base_id, 40, 2023, 30, 28, 'calculated_from_status', 'confirmed', 'Approved', 'Smith')
+  await createMaintenance(us_nc.base_id, 40, 2023, 30, 28, 'calculated_from_status', 'confirmed', 'Locked', 'Smith')
 
   // DE Total maintenance
   await createMaintenance(de_total.base_id, 25, 2022, 18, null, 'confirmed_by_site', 'confirmed', 'Locked', 'Mueller')
-  await createMaintenance(de_total.base_id, 25, 2023, 20, 18, 'confirmed_by_site', 'confirmed', 'Approved', 'Mueller')
+  await createMaintenance(de_total.base_id, 25, 2023, 20, 18, 'confirmed_by_site', 'confirmed', 'Locked', 'Mueller')
   await createMaintenance(de_total.base_id, 25, 2024, 21, 20, 'confirmed_by_site', 'hq_estimated', 'Submitted', 'Mueller')
 
   // DE Area maintenance
   await createMaintenance(de_area.base_id, 25, 2023, 20, null, 'estimated_by_active_rate', 'hq_estimated', 'Draft', 'Mueller')
 
   console.log('Created active maintenance records')
-
-  // IssueList for returned US record
-  await prisma.issueList.upsert({
-    where: { issue_id: 'seed-issue-us-2023' },
-    update: {},
-    create: {
-      issue_id: 'seed-issue-us-2023',
-      maintenance_id: usReturnedId,
-      issue_type: 'DataError',
-      issue_detail: 'Active count dropped significantly (28→18, -36%) without change reason. Please verify and provide explanation.',
-      requested_by: 'hq_user',
-      status: 'Open',
-    },
-  })
-
-  console.log('Created issue records')
   console.log('Seeding complete!')
 }
 

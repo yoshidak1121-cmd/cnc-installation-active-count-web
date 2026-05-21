@@ -36,7 +36,7 @@ export async function GET() {
 
   // Check ActiveMaintenance records
   const maintenanceWhere: Record<string, unknown> = {
-    status: { in: ['Draft', 'Returned'] },
+    status: { in: ['Draft', 'Submitted'] },
   }
   if (user.role === 'site_staff' && user.site_code) {
     maintenanceWhere.installation_base = { site_code: user.site_code }

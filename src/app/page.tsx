@@ -14,7 +14,6 @@ export default async function Home() {
     { title: 'Installation Data', desc: 'Manage CNC installation base records', href: '/installation', show: true, color: 'bg-blue-50 border-blue-200' },
     { title: 'Active Maintenance', desc: 'Enter and manage active maintenance data by year', href: '/active-maintenance', show: true, color: 'bg-green-50 border-green-200' },
     { title: 'Input Check', desc: 'Validate data integrity and find issues', href: '/input-check', show: true, color: 'bg-yellow-50 border-yellow-200' },
-    { title: 'HQ Review', desc: 'Review and approve submitted records', href: '/hq-review', show: isHqOrAdmin, color: 'bg-purple-50 border-purple-200' },
     { title: 'Aggregate Report', desc: 'View aggregated stats and export CSV', href: '/report', show: isHqOrAdmin, color: 'bg-indigo-50 border-indigo-200' },
   ]
 

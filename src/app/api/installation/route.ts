@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
   const installations = await prisma.installationBase.findMany({
     where,
-    orderBy: [{ site_code: 'asc' }, { install_year: 'asc' }, { primary_flag: 'desc' }],
+    orderBy: [{ site_code: 'asc' }, { install_year: 'asc' }],
   })
   return NextResponse.json(installations)
 }
@@ -56,7 +56,6 @@ export async function POST(req: NextRequest) {
       area: data.area ?? null,
       installed_count: Number(data.installed_count),
       installed_count_accuracy: data.installed_count_accuracy,
-      primary_flag: Boolean(data.primary_flag),
       source_file_name: data.source_file_name ?? null,
       source_note: data.source_note ?? null,
       note: data.note ?? null,

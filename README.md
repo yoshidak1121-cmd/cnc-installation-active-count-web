@@ -48,7 +48,6 @@ This creates:
 - 3 users (see below)
 - 6 installation base records (JP001, US001, DE001)
 - Active maintenance records for 2022–2024
-- Sample issues for returned records
 
 ### 5. Run development server
 
@@ -77,20 +76,15 @@ Open [http://localhost:3000](http://localhost:3000)
 ### Active Maintenance (`/active-maintenance`)
 - Enter active count data by year per installation base
 - Auto-calculates: inactive_count, active_rate, difference from previous year
-- Status workflow: Draft → Submitted → Approved/Returned → Locked
+- Status workflow: Draft → Submitted → Locked
 - Copy records from previous year (bulk)
 
 ### Input Check (`/input-check`)
 - Validates all records and shows errors, warnings, info items
 - Checks: missing required fields, active count > installed count, active rate < 5%, year-over-year change ≥ 20% without reason
 
-### HQ Review (`/hq-review`) — hq_staff, admin
-- Review submitted records
-- Approve or Return (with issue logging)
-- Lock approved records (admin only)
-
 ### Aggregate Report (`/report`) — hq_staff, admin
-- Summary by country/year from approved+locked primary records
+- Summary by country/year from submitted+locked records
 - Detail record view
 - CSV export
 
@@ -101,8 +95,7 @@ Open [http://localhost:3000](http://localhost:3000)
 | View own site data | ✓ | ✓ | ✓ |
 | View all sites | — | ✓ | ✓ |
 | Submit records | ✓ | — | — |
-| Approve/Return | — | ✓ | ✓ |
-| Lock records | — | — | ✓ |
+| Lock records | — | ✓ | ✓ |
 | View report | — | ✓ | ✓ |
 
 ## API Routes
@@ -117,14 +110,10 @@ Open [http://localhost:3000](http://localhost:3000)
 | GET/POST | `/api/active-maintenance` | List/create maintenance records |
 | PUT/DELETE | `/api/active-maintenance/[id]` | Update/delete |
 | POST | `/api/active-maintenance/[id]/submit` | Submit |
-| POST | `/api/active-maintenance/[id]/approve` | Approve |
-| POST | `/api/active-maintenance/[id]/return` | Return with issue |
 | POST | `/api/active-maintenance/[id]/lock` | Lock |
 | GET | `/api/check` | Run input validation checks |
 | GET | `/api/report` | Aggregated report data |
 | GET | `/api/report/export` | CSV export (type: installation\|maintenance\|report) |
-| GET/POST | `/api/issues` | List/create issues |
-| PUT | `/api/issues/[id]` | Update issue |
 
 ## Build
 

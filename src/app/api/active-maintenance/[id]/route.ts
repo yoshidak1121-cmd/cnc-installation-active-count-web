@@ -15,7 +15,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   })
   if (!record) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  if (user.role === 'site_staff' && !['Draft', 'Returned'].includes(record.status)) {
+  if (user.role === 'site_staff' && record.status !== 'Draft') {
     return NextResponse.json({ error: 'Cannot edit record in current status' }, { status: 403 })
   }
 

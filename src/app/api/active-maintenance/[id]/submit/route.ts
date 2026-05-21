@@ -9,8 +9,8 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params
   const record = await prisma.activeMaintenance.findUnique({ where: { maintenance_id: id } })
   if (!record) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  if (!['Draft', 'Returned'].includes(record.status)) {
-    return NextResponse.json({ error: 'Only Draft or Returned records can be submitted' }, { status: 400 })
+  if (record.status !== 'Draft') {
+    return NextResponse.json({ error: 'Only Draft records can be submitted' }, { status: 400 })
   }
 
   const updated = await prisma.activeMaintenance.update({

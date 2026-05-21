@@ -11,7 +11,6 @@ interface Installation {
   install_year: number
   data_granularity: string
   installed_count: number
-  primary_flag: boolean
 }
 
 interface MaintenanceRecord {
@@ -37,8 +36,6 @@ interface MaintenanceRecord {
 const STATUS_COLORS: Record<string, string> = {
   Draft: 'bg-gray-100 text-gray-700',
   Submitted: 'bg-blue-100 text-blue-700',
-  Approved: 'bg-green-100 text-green-700',
-  Returned: 'bg-red-100 text-red-700',
   Locked: 'bg-purple-100 text-purple-700',
 }
 
@@ -62,8 +59,6 @@ export default function ActiveMaintenancePage() {
   const [newForm, setNewForm] = useState({ base_id: '', active_count: 0, previous_active_count: '', active_count_method: 'Survey', active_count_accuracy: 'confirmed', status_confirmed_date: '', confirmed_by: '', change_reason: '', note: '' })
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
-  const [returnModal, setReturnModal] = useState<{ id: string } | null>(null)
-  const [returnForm, setReturnForm] = useState({ issue_type: '', issue_detail: '' })
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(d => setUserRole(d?.user?.role ?? ''))
@@ -124,35 +119,6 @@ export default function ActiveMaintenancePage() {
     const res = await fetch(`/api/active-maintenance/${id}/submit`, { method: 'POST' })
     if (res.ok) { fetchRecords(); setMessage('Submitted'); setTimeout(() => setMessage(''), 2000) }
     else { const d = await res.json(); alert(d.error) }
-  }
-
-  async function handleApprove(id: string) {
-    const res = await fetch(`/api/active-maintenance/${id}/approve`, { method: 'POST' })
-    if (res.ok) { fetchRecords(); setMessage('Approved'); setTimeout(() => setMessage(''), 2000) }
-    else { const d = await res.json(); alert(d.error) }
-  }
-
-  async function handleReturn(id: string) {
-    setReturnModal({ id })
-    setReturnForm({ issue_type: '', issue_detail: '' })
-  }
-
-  async function submitReturn() {
-    if (!returnModal) return
-    if (!returnForm.issue_type || !returnForm.issue_detail) { alert('Both fields required'); return }
-    const res = await fetch(`/api/active-maintenance/${returnModal.id}/return`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(returnForm),
-    })
-    if (res.ok) {
-      setReturnModal(null)
-      fetchRecords()
-      setMessage('Returned')
-      setTimeout(() => setMessage(''), 2000)
-    } else {
-      const d = await res.json(); alert(d.error)
-    }
   }
 
   async function handleLock(id: string) {
@@ -264,10 +230,9 @@ export default function ActiveMaintenancePage() {
                 <tr><td colSpan={14} className="text-center py-8 text-gray-400">No records found</td></tr>
               ) : records.map((r) => {
                 const isEditing = editId === r.maintenance_id
-                const canEdit = isSiteStaff && ['Draft', 'Returned'].includes(r.status)
-                const canSubmit = isSiteStaff && ['Draft', 'Returned'].includes(r.status)
-                const canApproveReturn = isHqOrAdmin && ['Submitted', 'Under Review'].includes(r.status)
-                const canLock = userRole === 'admin' && r.status === 'Approved'
+                const canEdit = isSiteStaff && r.status === 'Draft'
+                const canSubmit = isSiteStaff && r.status === 'Draft'
+                const canLock = isHqOrAdmin && r.status === 'Submitted'
                 const canDelete = r.status === 'Draft'
 
                 return (
@@ -324,12 +289,6 @@ export default function ActiveMaintenancePage() {
                           <>
                             {canEdit && <button onClick={() => startEdit(r)} className="text-xs text-blue-600 hover:underline">Edit</button>}
                             {canSubmit && <button onClick={() => handleSubmit(r.maintenance_id)} className="text-xs text-green-600 hover:underline">Submit</button>}
-                            {canApproveReturn && (
-                              <>
-                                <button onClick={() => handleApprove(r.maintenance_id)} className="text-xs text-green-600 hover:underline">Approve</button>
-                                <button onClick={() => handleReturn(r.maintenance_id)} className="text-xs text-red-500 hover:underline">Return</button>
-                              </>
-                            )}
                             {canLock && <button onClick={() => handleLock(r.maintenance_id)} className="text-xs text-purple-600 hover:underline">Lock</button>}
                             {canDelete && <button onClick={() => handleDelete(r.maintenance_id)} className="text-xs text-red-400 hover:underline">Delete</button>}
                           </>
@@ -416,31 +375,6 @@ export default function ActiveMaintenancePage() {
         </div>
       )}
 
-      {returnModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-bold mb-4">Return Record</h2>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium mb-1">Issue Type *</label>
-                <input value={returnForm.issue_type} onChange={e => setReturnForm({ ...returnForm, issue_type: e.target.value })}
-                  placeholder="e.g. DataError, MissingInfo"
-                  className="w-full border rounded px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Issue Detail *</label>
-                <textarea value={returnForm.issue_detail} onChange={e => setReturnForm({ ...returnForm, issue_detail: e.target.value })}
-                  placeholder="Describe the issue…"
-                  className="w-full border rounded px-3 py-2 text-sm" rows={4} />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button onClick={() => setReturnModal(null)} className="px-4 py-2 rounded border text-sm">Cancel</button>
-              <button onClick={submitReturn} className="px-4 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-500">Return</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
